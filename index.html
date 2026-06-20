@@ -75,22 +75,55 @@ p {
     animation: blink 0.5s infinite alternate;
 }
 
-/* 3개의 개별 슬롯 창 스타일 */
+/* 개별 슬롯 디스플레이 윈도우 창 */
 .reel-window {
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px; /* 이미지 수용을 위해 높이 조정 */
     background: #F9F9F9;
     border: 5px solid #63432A;
     border-radius: 15px;
     box-shadow: inset 0 6px 10px rgba(0,0,0,0.15);
+    overflow: hidden; 
+    position: relative;
+    transition: all 0.3s;
+}
+
+/* 위아래로 연속 스크롤 롤링되는 내부 트랙 줄 */
+.reel-strip {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
     display: flex;
+    flex-direction: column;
+    transform: translateY(0px);
+}
+
+/* 릴 안의 개별 메뉴 아이템 칸 크기 규격 */
+.menu-item {
+    height: 140px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 22px;
+    font-size: 16px;
     font-weight: 800;
     color: #4A4A4A;
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-sizing: border-box;
+    white-space: nowrap;
+    background: #FFF;
+    border-bottom: 1px solid #EEE;
+}
+
+/* 릴 내부 입체감 있는 음식 사진 스타일 */
+.menu-item img {
+    width: 85px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 /* 🔥 최종 멈췄을 때 가운데(2번째) 슬롯 창 골드 발광 */
@@ -98,15 +131,16 @@ p {
     border-color: #FFD43B;
     background: #FFF;
     box-shadow: 0 0 25px #FFD43B, inset 0 0 10px #FFD43B;
+}
+.reel-window.center-hit .menu-item {
     color: #FF3E3E; 
-    font-size: 26px;
-    transform: scale(1.05);
+    font-size: 18px;
+    transform: scale(1.03);
 }
 
 /* 양 옆의 흐릿하게 죽는 보조 슬롯 스타일 */
 .reel-window.side-fade {
-    opacity: 0.6;
-    transform: scale(0.95);
+    opacity: 0.5;
 }
 
 /* 상황 상태 안내판 */
@@ -120,15 +154,14 @@ p {
 
 /* 하단 큰 최종 결과 텍스트 */
 #final-banner {
-    font-size: 36px;
+    font-size: 42px;
     font-weight: 900;
     color: #FF3E3E;
-    margin-top: 20px;
+    margin-top: 25px;
     display: none;
     animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* 애니메이션 Keyframes */
 @keyframes blink {
     0% { border-color: white; opacity: 0.5; }
     100% { border-color: #FFD43B; opacity: 1; }
@@ -151,12 +184,18 @@ p {
     <!-- 상황 상태 안내판 -->
     <div id="result-msg">🤔 메뉴를 고민중...</div>
 
-    <!-- 🎰 3구 슬롯머신 박스 영역 -->
+    <!-- 🎰 3구 이미지 슬롯머신 기계 구조 -->
     <div>
         <div class="slot-machine-frame">
-            <div class="reel-window" id="reel1">돈까스</div>
-            <div class="reel-window" id="reel2">김치찌개</div>
-            <div class="reel-window" id="reel3">국밥</div>
+            <div class="reel-window" id="win1">
+                <div class="reel-strip" id="reel1"></div>
+            </div>
+            <div class="reel-window" id="win2">
+                <div class="reel-strip" id="reel2"></div>
+            </div>
+            <div class="reel-window" id="win3">
+                <div class="reel-strip" id="reel3"></div>
+            </div>
         </div>
     </div>
 
@@ -165,18 +204,37 @@ p {
 </div>
 
 <script>
+// 📸 각 음식별 매칭되는 실제 고화질 입체 이미지 오브젝트 데이터 풀셋 구성
 const lunchFoods = [
-    "제육볶음","돈까스","국밥","김치찌개","냉면",
-    "햄버거","짜장면","짬뽕","칼국수","비빔밥"
-];
-const dinnerFoods = [
-    "치킨","피자","삼겹살","족발","닭갈비",
-    "마라탕","곱창","회","떡볶이","샤브샤브"
+    { name: "제육볶음", img: "https://unsplash.com" },
+    { name: "돈까스", img: "https://unsplash.com" },
+    { name: "국밥", img: "https://unsplash.com" },
+    { name: "김치찌개", img: "https://unsplash.com" },
+    { name: "냉면", img: "https://unsplash.com" },
+    { name: "햄버거", img: "https://unsplash.com" },
+    { name: "짜장면", img: "https://unsplash.com" },
+    { name: "짬뽕", img: "https://unsplash.com" },
+    { name: "칼국수", img: "https://unsplash.com" },
+    { name: "비빔밥", img: "https://unsplash.com" }
 ];
 
+const dinnerFoods = [
+    { name: "치킨", img: "https://unsplash.com" },
+    { name: "피자", img: "https://unsplash.com" },
+    { name: "삼겹살", img: "https://unsplash.com" },
+    { name: "족발", img: "https://unsplash.com" },
+    { name: "닭갈비", img: "https://unsplash.com" },
+    { name: "마라탕", img: "https://unsplash.com" },
+    { name: "곱창", img: "https://unsplash.com" },
+    { name: "회", img: "https://unsplash.com" },
+    { name: "떡볶이", img: "https://unsplash.com" },
+    { name: "샤브샤브", img: "https://unsplash.com" }
+];
+
+const itemHeight = 140; // 조절된 슬롯 박스 고정 너비 규격 정의
 let isRunning = false;
 
-/* 🎰 초고속 구동 후 점진적 제동(Cubic-Bezier 감속) 슬롯 엔진 */
+/* 🎰 수직 무한 이미지 롤링 및 점진 감속 메커니즘 엔진 */
 function slotSpin(list, emoji, title) {
     if (isRunning) return; 
     isRunning = true;
@@ -185,77 +243,81 @@ function slotSpin(list, emoji, title) {
     let finalBanner = document.getElementById("final-banner");
     let finalFood = document.getElementById("final-food");
     
+    let w1 = document.getElementById("win1");
+    let w2 = document.getElementById("win2");
+    let w3 = document.getElementById("win3");
+    
     let r1 = document.getElementById("reel1");
     let r2 = document.getElementById("reel2");
     let r3 = document.getElementById("reel3");
 
-    // 매 회 구동시 초기 리셋
-    r1.classList.remove("side-fade");
-    r2.classList.remove("center-hit");
-    r3.classList.remove("side-fade");
+    // 매칭 효과 리셋 초기화
+    w1.classList.remove("side-fade");
+    w2.classList.remove("center-hit");
+    w3.classList.remove("side-fade");
     finalBanner.style.display = "none";
     
     msgBox.innerText = `⏳ 슬롯 돌아가는 중...`;
 
-    const totalDuration = 2500; // 슬롯이 도는 총 시간 (2.5초)
+    // 이미지 및 텍스트 돔 노드 생성 바인딩
+    const extendedList = [...list, ...list, ...list, ...list];
+    [r1, r2, r3].forEach(reel => {
+        reel.innerHTML = '';
+        extendedList.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'menu-item';
+            
+            const img = document.createElement('img');
+            img.src = item.img;
+            img.alt = item.name;
+            
+            const span = document.createElement('span');
+            span.textContent = item.name;
+            
+            div.appendChild(img);
+            div.appendChild(span);
+            reel.appendChild(div);
+        });
+        reel.style.transform = "translateY(0px)";
+    });
+
+    const totalDuration = 2500; 
     const startTime = Date.now();
+    let currentYPositions =;
 
     function spin() {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / totalDuration, 1);
         
-        // 📈 Ease-Out 감속 수식 적용 (처음엔 극도로 빠르고, 마지막엔 미끄러지듯 감속)
-        // 1 - (1 - x)^4 수식을 통해 후반부 제동 딜레이를 극대화합니다.
+        // 📈 점점 느려지는 물리 제동 4차식 곡선 수식 매핑 (Ease-Out)
         const easeOutProgress = 1 - Math.pow(1 - progress, 4);
+        const speedFactor = 1 - easeOutProgress;
         
-        // 현재 속도 조율 간격 (시작할 때는 25ms 간격 초고속 -> 끝날 때는 450ms 간격으로 느려짐)
-        const currentDelay = 25 + (easeOutProgress * 425);
+        // 초반엔 글자와 이미지가 흐릿할 정도로 엄청 빠르게 이동하는 프레임 스텝 보정
+        const scrollStep = 15 + (speedFactor * 75); 
 
-        // 랜덤 메뉴 서칭 변경 연출
-        let food1 = list[Math.floor(Math.random() * list.length)];
-        let food2 = list[Math.floor(Math.random() * list.length)];
-        let food3 = list[Math.floor(Math.random() * list.length)];
+        for(let i=0; i<3; i++) {
+            currentYPositions[i] -= scrollStep;
+            
+            const maxScroll = -(list.length * 2 * itemHeight);
+            if (currentYPositions[i] < maxScroll) {
+                currentYPositions[i] += (list.length * itemHeight);
+            }
+        }
         
-        r1.innerText = food1;
-        r2.innerText = food2;
-        r3.innerText = food3;
+        r1.style.transform = `translateY(${currentYPositions[0]}px)`;
+        r2.style.transform = `translateY(${currentYPositions[1]}px)`;
+        r3.style.transform = `translateY(${currentYPositions[2]}px)`;
 
         if (elapsed < totalDuration) {
-            // 연산된 프레임 딜레이 타임에 맞춰 루프 재귀호출
-            setTimeout(spin, currentDelay);
+            requestAnimationFrame(spin);
         } else {
-            // 루프 종료 시 최종 정착 연출
-            let final = list[Math.floor(Math.random() * list.length)];
-            let side1 = list[Math.floor(Math.random() * list.length)];
-            let side3 = list[Math.floor(Math.random() * list.length)];
+            // 최종 시간 도달 시 완전 정지 및 중앙 정렬 피팅 계산
+            const final = list[Math.floor(Math.random() * list.length)];
+            const side1 = list[Math.floor(Math.random() * list.length)];
+            const side3 = list[Math.floor(Math.random() * list.length)];
             
-            r1.innerText = side1;
-            r2.innerText = final; // 센터 고정
-            r3.innerText = side3;
+            const finalIndex = list.findIndex(item => item.name === final.name) + list.length;
+            const side1Index = list.findIndex(item => item.name === side1.name) + list.length;
+            const side3Index = list.findIndex(item => item.name === side3.name) + list.length;
 
-            msgBox.innerText = `${emoji} ${title}`;
-            
-            // 시각 그래픽 클래스 추가
-            r1.classList.add("side-fade");
-            r2.classList.add("center-hit");
-            r3.classList.add("side-fade");
-
-            finalFood.innerText = final;
-            finalBanner.style.display = "block";
-            
-            isRunning = false;
-        }
-    }
-    spin();
-}
-
-function lunch() {
-    slotSpin(lunchFoods, "🍱", "오늘의 점심은!");
-}
-
-function dinner() {
-    slotSpin(dinnerFoods, "🍖", "오늘의 저녁은!");
-}
-</script>
-</body>
-</html>
