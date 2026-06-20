@@ -14,9 +14,8 @@ body{
     font-family:Arial;
     text-align:center;
 
-    background: url("/mnt/data/a_bright_playful_web_app_ui_mockup_sho.png");
-    background-size:cover;
-    background-position:center;
+    /* ⚠️ 브라우저에서 안 깨지게 단순 배경으로 변경 */
+    background: #fff4e6;
 }
 
 .lunch, .dinner{
@@ -95,7 +94,7 @@ const dinnerFoods = [
 "마라탕","곱창","회","떡볶이","샤브샤브"
 ];
 
-/* 🎰 슬롯머신 핵심 업그레이드 버전 */
+/* 🎰 슬롯머신 안정 + 감속 버전 */
 function slotSpin(list, emoji, title){
 
     let resultBox = document.getElementById("result");
@@ -110,8 +109,8 @@ function slotSpin(list, emoji, title){
         let elapsed = Date.now() - start;
         let progress = elapsed / duration;
 
-        // 🎰 점점 확 느려지는 슬롯 감속
-        let speed = 30 + Math.pow(progress, 3) * 500;
+        // 🔥 안정적인 감속 (안 멈춘 느낌 제거)
+        let speed = 40 + Math.min(Math.pow(progress, 2.5) * 300, 300);
 
         let food;
 
@@ -124,7 +123,7 @@ function slotSpin(list, emoji, title){
         resultBox.innerHTML = `
             <div class="slot" style="
                 font-size:22px;
-                transform:scale(${1 + Math.random()*0.06});
+                transform:scale(${1 + Math.random()*0.04});
                 transition:0.05s;
             ">
                 ${emoji}<br>
