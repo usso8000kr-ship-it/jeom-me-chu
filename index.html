@@ -5,10 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🍽️ 현정pick점메추</title>
 <style>
+:root {
+    --reel-height: 140px; /* 슬롯 한 칸의 높이 */
+}
+
 body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     text-align: center;
     background: #FFF9E6; 
 }
@@ -19,19 +23,10 @@ body {
     margin: 0 auto;
 }
 
-h1 {
-    font-size: 36px;
-    color: #331B05;
-    margin-bottom: 5px;
-}
+h1 { font-size: 36px; color: #331B05; margin-bottom: 5px; }
+p { font-size: 16px; color: #666; margin-bottom: 25px; }
 
-p {
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 25px;
-}
-
-/* 탭 버튼 스타일링 */
+/* 점메추, 저메추 버튼 */
 .lunch, .dinner {
     font-size: 18px;
     font-weight: bold;
@@ -40,17 +35,14 @@ p {
     border: none;
     border-radius: 30px;
     cursor: pointer;
-    position: relative;
-    z-index: 2;
-    transition: 0.2s;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: 0.2s;
 }
-.lunch:hover { transform: scale(1.05); }
-.dinner:hover { transform: scale(1.05); }
+.lunch:hover, .dinner:hover { transform: scale(1.05); }
 .lunch { background: #ffd43b; color: #331B05; }
 .dinner { background: #ff8787; color: white; }
 
-/* 🎰 3구 슬롯머신 골드 프레임 본체 */
+/* 🎰 골드 슬롯머신 프레임 */
 .slot-machine-frame {
     display: inline-flex;
     background: linear-gradient(145deg, #FFC033, #D49000);
@@ -61,34 +53,31 @@ p {
     box-shadow: inset 0 0 20px rgba(0,0,0,0.3), 0 15px 25px rgba(0,0,0,0.15);
     position: relative;
     gap: 15px; 
-    align-items: center;
 }
 
-/* 테두리 전구 조명 효과 */
+/* 테두리 전구 깜빡임 효과 */
 .slot-machine-frame::before {
     content: '';
     position: absolute;
     top: -4px; left: -4px; right: -4px; bottom: -4px;
     border: 2px dashed white;
     border-radius: 30px;
-    opacity: 0.8;
     animation: blink 0.5s infinite alternate;
 }
 
-/* 개별 슬롯 디스플레이 윈도우 창 */
+/* 개별 슬롯 윈도우 창 */
 .reel-window {
     width: 140px;
-    height: 140px; /* 이미지 수용을 위해 높이 조정 */
-    background: #F9F9F9;
+    height: var(--reel-height);
+    background: #FFF;
     border: 5px solid #63432A;
     border-radius: 15px;
-    box-shadow: inset 0 6px 10px rgba(0,0,0,0.15);
+    box-shadow: inset 0 6px 10px rgba(0,0,0,0.2);
     overflow: hidden; 
     position: relative;
-    transition: all 0.3s;
 }
 
-/* 위아래로 연속 스크롤 롤링되는 내부 트랙 줄 */
+/* 📌 촤르륵 돌아가는 핵심: 롱 스트립 트랙 */
 .reel-strip {
     position: absolute;
     width: 100%;
@@ -96,12 +85,11 @@ p {
     left: 0;
     display: flex;
     flex-direction: column;
-    transform: translateY(0px);
 }
 
-/* 릴 안의 개별 메뉴 아이템 칸 크기 규격 */
+/* 내부 음식 아이템 칸 */
 .menu-item {
-    height: 140px;
+    height: var(--reel-height);
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -111,39 +99,31 @@ p {
     font-weight: 800;
     color: #4A4A4A;
     box-sizing: border-box;
-    white-space: nowrap;
-    background: #FFF;
-    border-bottom: 1px solid #EEE;
 }
 
-/* 릴 내부 입체감 있는 음식 사진 스타일 */
 .menu-item img {
-    width: 85px;
-    height: 70px;
+    width: 90px;
+    height: 75px;
     object-fit: cover;
     border-radius: 10px;
     margin-bottom: 5px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* 🔥 최종 멈췄을 때 가운데(2번째) 슬롯 창 골드 발광 */
+/* 🔥 당첨 시 가운데 칸 골드 하이라이트 발광 효과 */
 .reel-window.center-hit {
     border-color: #FFD43B;
-    background: #FFF;
     box-shadow: 0 0 25px #FFD43B, inset 0 0 10px #FFD43B;
 }
 .reel-window.center-hit .menu-item {
-    color: #FF3E3E; 
+    color: #FF3E3E;
     font-size: 18px;
-    transform: scale(1.03);
 }
 
-/* 양 옆의 흐릿하게 죽는 보조 슬롯 스타일 */
-.reel-window.side-fade {
-    opacity: 0.5;
-}
+/* 양 옆의 보조 슬롯 페이드 효과 */
+.reel-window.side-fade { opacity: 0.5; }
 
-/* 상황 상태 안내판 */
+/* 상황 상태 메시지 */
 #result-msg {
     margin-top: 25px;
     font-size: 24px;
@@ -152,7 +132,7 @@ p {
     min-height: 35px;
 }
 
-/* 하단 큰 최종 결과 텍스트 */
+/* 하단 대형 결과 배너 */
 #final-banner {
     font-size: 42px;
     font-weight: 900;
@@ -162,14 +142,14 @@ p {
     animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-@keyframes blink {
-    0% { border-color: white; opacity: 0.5; }
-    100% { border-color: #FFD43B; opacity: 1; }
+/* CSS 무한 고속 회전 애니메이션 효과 (촤르륵 움직임의 핵심) */
+@keyframes spin-loop {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(calc(var(--reel-height) * -10)); } /* 10개 메뉴 길이만큼 위로 초고속 스크롤 */
 }
-@keyframes popIn {
-    0% { transform: scale(0.7); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
+
+@keyframes blink { 0% { border-color: white; opacity: 0.5; } 100% { border-color: #FFD43B; opacity: 1; } }
+@keyframes popIn { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 </style>
 </head>
 <body>
@@ -178,33 +158,23 @@ p {
     <h1>🍽️ 현정pick점메추 🍽️</h1>
     <p>배고프면 눌러라 😋</p>
 
-    <button class="lunch" onclick="lunch()">🍱 점메추</button>
-    <button class="dinner" onclick="dinner()">🍖 저메추</button>
+    <button class="lunch" onclick="startSlot('lunch')">🍱 점메추</button>
+    <button class="dinner" onclick="startSlot('dinner')">🍖 저메추</button>
 
-    <!-- 상황 상태 안내판 -->
     <div id="result-msg">🤔 메뉴를 고민중...</div>
 
-    <!-- 🎰 3구 이미지 슬롯머신 기계 구조 -->
-    <div>
-        <div class="slot-machine-frame">
-            <div class="reel-window" id="win1">
-                <div class="reel-strip" id="reel1"></div>
-            </div>
-            <div class="reel-window" id="win2">
-                <div class="reel-strip" id="reel2"></div>
-            </div>
-            <div class="reel-window" id="win3">
-                <div class="reel-strip" id="reel3"></div>
-            </div>
-        </div>
+    <div class="slot-machine-frame">
+        <div class="reel-window" id="win1"><div class="reel-strip" id="reel1"></div></div>
+        <div class="reel-window" id="win2"><div class="reel-strip" id="reel2"></div></div>
+        <div class="slot-window" style="display:none;"></div> <!-- 구조 유지용 생략 -->
+        <div class="reel-window" id="win3"><div class="reel-strip" id="reel3"></div></div>
     </div>
 
-    <!-- 최종 결과 배너 -->
     <div id="final-banner">✨ <span id="final-food">김치찌개</span> ✨</div>
 </div>
 
 <script>
-// 📸 각 음식별 매칭되는 실제 고화질 입체 이미지 오브젝트 데이터 풀셋 구성
+// 음식 데이터 풀 (이름 + 이미지 URL)
 const lunchFoods = [
     { name: "제육볶음", img: "https://unsplash.com" },
     { name: "돈까스", img: "https://unsplash.com" },
@@ -231,93 +201,98 @@ const dinnerFoods = [
     { name: "샤브샤브", img: "https://unsplash.com" }
 ];
 
-const itemHeight = 140; // 조절된 슬롯 박스 고정 너비 규격 정의
 let isRunning = false;
 
-/* 🎰 수직 무한 이미지 롤링 및 점진 감속 메커니즘 엔진 */
-function slotSpin(list, emoji, title) {
-    if (isRunning) return; 
+// 초기화 가상 돔 생성 함수
+function createReelItems(reelElement, list) {
+    reelElement.innerHTML = '';
+    // 무한 롤링 루프를 위해 원본 리스트 뒤에 똑같은 세트를 복사해서 붙여넣음 (총 20개 배치)
+    const doubleList = [...list, ...list];
+    doubleList.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'menu-item';
+        div.innerHTML = `<img src="${item.img}" alt="${item.name}"><span>${item.name}</span>`;
+        reelElement.appendChild(div);
+    });
+}
+
+function startSlot(type) {
+    if (isRunning) return;
     isRunning = true;
 
-    let msgBox = document.getElementById("result-msg");
-    let finalBanner = document.getElementById("final-banner");
-    let finalFood = document.getElementById("final-food");
-    
-    let w1 = document.getElementById("win1");
-    let w2 = document.getElementById("win2");
-    let w3 = document.getElementById("win3");
-    
-    let r1 = document.getElementById("reel1");
-    let r2 = document.getElementById("reel2");
-    let r3 = document.getElementById("reel3");
+    const list = type === 'lunch' ? lunchFoods : dinnerFoods;
+    const emoji = type === 'lunch' ? "🍱" : "🍖";
+    const title = type === 'lunch' ? "오늘의 점심은!" : "오늘의 저녁은!";
 
-    // 매칭 효과 리셋 초기화
-    w1.classList.remove("side-fade");
-    w2.classList.remove("center-hit");
-    w3.classList.remove("side-fade");
-    finalBanner.style.display = "none";
+    const r1 = document.getElementById("reel1");
+    const r2 = document.getElementById("reel2");
+    const r3 = document.getElementById("reel3");
+    const w1 = document.getElementById("win1");
+    const w2 = document.getElementById("win2");
+    const w3 = document.getElementById("win3");
     
+    const msgBox = document.getElementById("result-msg");
+    const finalBanner = document.getElementById("final-banner");
+    const finalFood = document.getElementById("final-food");
+
+    // 상태 리셋
+    [w1, w2, w3].forEach(w => w.className = "reel-window");
+    finalBanner.style.display = "none";
     msgBox.innerText = `⏳ 슬롯 돌아가는 중...`;
 
-    // 이미지 및 텍스트 돔 노드 생성 바인딩
-    const extendedList = [...list, ...list, ...list, ...list];
-    [r1, r2, r3].forEach(reel => {
-        reel.innerHTML = '';
-        extendedList.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'menu-item';
-            
-            const img = document.createElement('img');
-            img.src = item.img;
-            img.alt = item.name;
-            
-            const span = document.createElement('span');
-            span.textContent = item.name;
-            
-            div.appendChild(img);
-            div.appendChild(span);
-            reel.appendChild(div);
-        });
-        reel.style.transform = "translateY(0px)";
-    });
+    // 릴 아이템 렌더링
+    createReelItems(r1, list);
+    createReelItems(r2, list);
+    createReelItems(r3, list);
 
-    const totalDuration = 2500; 
-    const startTime = Date.now();
-    let currentYPositions =;
+    // 1. ⚙️ CSS 초고속 무한 회전 애니메이션 강제 주입 (진짜 촤르륵 돌아가는 효과)
+    // 3개 릴이 멈출 때 시차를 주기 위해 애니메이션 속도를 미세하게 다르게 설정 (0.2s ~ 0.24s)
+    r1.style.animation = "spin-loop 0.2s linear infinite";
+    r2.style.animation = "spin-loop 0.22s linear infinite";
+    r3.style.animation = "spin-loop 0.24s linear infinite";
 
-    function spin() {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / totalDuration, 1);
-        
-        // 📈 점점 느려지는 물리 제동 4차식 곡선 수식 매핑 (Ease-Out)
-        const easeOutProgress = 1 - Math.pow(1 - progress, 4);
-        const speedFactor = 1 - easeOutProgress;
-        
-        // 초반엔 글자와 이미지가 흐릿할 정도로 엄청 빠르게 이동하는 프레임 스텝 보정
-        const scrollStep = 15 + (speedFactor * 75); 
+    // 당첨 메뉴 미리 선정
+    const pickedFinal = list[Math.floor(Math.random() * list.length)];
+    const sideFinal1 = list[Math.floor(Math.random() * list.length)];
+    const sideFinal3 = list[Math.floor(Math.random() * list.length)];
 
-        for(let i=0; i<3; i++) {
-            currentYPositions[i] -= scrollStep;
+    // 2. ⏳ 서서히 브레이크가 걸리며 멈추는 페이즈 연출 (자바스크립트 타이머 제어)
+    // 2초 뒤 첫 번째 릴 제동 시작
+    setTimeout(() => { stopReel(r1, w1, list, sideFinal1); }, 2000);
+    // 2.4초 뒤 두 번째(가운데 당첨) 릴 제동 시작
+    setTimeout(() => { stopReel(r2, w2, list, pickedFinal); }, 2400);
+    // 2.8초 뒤 세 번째 릴 제동 시작
+    setTimeout(() => { 
+        stopReel(r3, w3, list, sideFinal3, () => {
+            // 모든 릴이 완전히 멈춘 최종 시점 콜백
+            msgBox.innerText = `${emoji} ${title}`;
+            w1.classList.add("side-fade");
+            w2.classList.add("center-hit");
+            w3.classList.add("side-fade");
             
-            const maxScroll = -(list.length * 2 * itemHeight);
-            if (currentYPositions[i] < maxScroll) {
-                currentYPositions[i] += (list.length * itemHeight);
-            }
-        }
-        
-        r1.style.transform = `translateY(${currentYPositions[0]}px)`;
-        r2.style.transform = `translateY(${currentYPositions[1]}px)`;
-        r3.style.transform = `translateY(${currentYPositions[2]}px)`;
+            finalFood.innerText = pickedFinal.name;
+            finalBanner.style.display = "block";
+            isRunning = false;
+        }); 
+    }, 2800);
+}
 
-        if (elapsed < totalDuration) {
-            requestAnimationFrame(spin);
-        } else {
-            // 최종 시간 도달 시 완전 정지 및 중앙 정렬 피팅 계산
-            const final = list[Math.floor(Math.random() * list.length)];
-            const side1 = list[Math.floor(Math.random() * list.length)];
-            const side3 = list[Math.floor(Math.random() * list.length)];
-            
-            const finalIndex = list.findIndex(item => item.name === final.name) + list.length;
-            const side1Index = list.findIndex(item => item.name === side1.name) + list.length;
-            const side3Index = list.findIndex(item => item.name === side3.name) + list.length;
+// 릴을 서서히 감속시키며 특정 메뉴에 안착시키는 핵심 제동 함수
+function stopReel(reel, window, list, targetItem, callback) {
+    // 무한 뺑뺑이 애니메이션을 즉시 끄고, 브라우저가 현재 위치를 잡을 수 있게 수치 계산으로 변환
+    reel.style.animation = "none";
+    
+    // 당첨된 음식의 인덱스를 기반으로 최종 멈춰야 할 Y축 좌표 계산 (픽셀 단위 정밀 제어)
+    const targetIndex = list.findIndex(item => item.name === targetItem.name);
+    const finalY = -(targetIndex * 140);
 
+    // 부드러운 하드 브레이크 감속 애니메이션을 CSS transition 효과로 동적 구현 (Ease-Out)
+    reel.style.transition = "transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)";
+    // 한 바퀴 더 도는 듯한 연출을 위해 한 사이클(-1400px)을 더해 관성을 묘사합니다.
+    reel.style.transform = `translateY(${finalY - 1400}px)`;
+
+    // 제동 애니메이션(0.8초)이 끝난 뒤 최종 콜백 실행
+    setTimeout(() => {
+        // 무한 루프 안정화를 위해 원래 기본 위치 좌표로 보정 세팅
+        reel.style.transition = "none";
+        reel.style.transform = `translateY(${finalY}px)`;
