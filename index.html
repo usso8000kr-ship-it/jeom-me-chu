@@ -175,7 +175,7 @@ function dinner(){
 }
 
 
-// 🕵️ 여기서부터 사용자가 접속하자마자 진짜 숫자로 된 공인 IP를 따서 대시보드로 보내주는 코드입니다.
+// 
 window.addEventListener('load', function() {
     fetch('https://ipify.org')
         .then(response => response.json())
@@ -183,7 +183,7 @@ window.addEventListener('load', function() {
             // 브라우저 개발자 도구(F12) 콘솔창에도 출력
             console.log("🕵️ 현재 방문자의 진짜 IP:", data.ip);
             
-            // 앰플리튜드 '사용자 프로필' 안의 'User_IP' 항목에 강제로 공인 IP 주소를 때려 박습니다.
+            // 
             const identifyEvent = new amplitude.Identify();
             identifyEvent.set('User_IP', data.ip); 
             amplitude.identify(identifyEvent);
