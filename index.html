@@ -6,13 +6,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🍽️ 현정pick점메추</title>
 
-<!-- 👇 여기에 복사하신 앰플리튜드 추적 코드가 들어갔습니다! -->
-<script src="https://cdn.amplitude.com/script/3b4b3a8b1a9cb924a457a9458ca9ffcc.js"></script>
+<!-- ⚙️ 앰플리튜드 연동 기본 스크립트 -->
+<script src="https://amplitude.com"></script>
 <script>
     window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));
     window.amplitude.init('3b4b3a8b1a9cb924a457a9458ca9ffcc', {"fetchRemoteConfig":true,"autocapture":true});
 </script>
-<!-- 👆 여기까지 추가 완료 -->
 
 <style>
 
@@ -174,6 +173,23 @@ function lunch(){
 function dinner(){
     slotSpin(dinnerFoods, "🍖", "오늘의 저녁은!");
 }
+
+
+// 🕵️ 여기서부터 사용자가 접속하자마자 진짜 숫자로 된 공인 IP를 따서 대시보드로 보내주는 코드입니다.
+window.addEventListener('load', function() {
+    fetch('https://ipify.org')
+        .then(response => response.json())
+        .then(data => {
+            // 브라우저 개발자 도구(F12) 콘솔창에도 출력
+            console.log("🕵️ 현재 방문자의 진짜 IP:", data.ip);
+            
+            // 앰플리튜드 '사용자 프로필' 안의 'User_IP' 항목에 강제로 공인 IP 주소를 때려 박습니다.
+            const identifyEvent = new amplitude.Identify();
+            identifyEvent.set('User_IP', data.ip); 
+            amplitude.identify(identifyEvent);
+        })
+        .catch(error => console.error('IP 추적 오류:', error));
+});
 
 </script>
 
